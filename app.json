@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sindoca.app"
+      "bundleIdentifier": "com.sindoca.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -58,6 +61,12 @@
       "color": "#ff6b9d",
       "androidMode": "default",
       "androidCollapsedTitle": "Sindoca"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "06b45b88-cb7e-442e-9c76-244b58078a8b"
+      }
     }
   }
 }
