@@ -48,7 +48,7 @@ export function useDeepLinking() {
       router.push('/(tabs)/perfil');
     } else {
       // Default to home
-      router.push('/(tabs)/');
+      router.push('/(tabs)/' as any);
     }
   };
 

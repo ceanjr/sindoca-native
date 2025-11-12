@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "sindoca-native",
+    "name": "Sindoca",
     "slug": "sindoca-native",
+    "description": "App de relacionamento íntimo para casais - Mensagens, fotos, música e muito mais",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,8 +17,13 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sindoca.app",
+      "buildNumber": "1",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Sindoca precisa acessar a câmera para tirar fotos e vídeos.",
+        "NSPhotoLibraryUsageDescription": "Sindoca precisa acessar suas fotos para compartilhar momentos.",
+        "NSMicrophoneUsageDescription": "Sindoca precisa acessar o microfone para gravar áudios.",
+        "NSPhotoLibraryAddUsageDescription": "Sindoca precisa salvar fotos na sua galeria."
       }
     },
     "android": {
@@ -26,11 +32,15 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.sindoca.app",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO",
+        "POST_NOTIFICATIONS"
       ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -51,6 +61,19 @@
             "./assets/sounds/notification.wav"
           ]
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Sindoca precisa acessar suas fotos para compartilhar momentos.",
+          "cameraPermission": "Sindoca precisa acessar a câmera para tirar fotos e vídeos."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Sindoca precisa acessar o microfone para gravar áudios."
+        }
       ]
     ],
     "experiments": {
@@ -67,6 +90,13 @@
       "eas": {
         "projectId": "06b45b88-cb7e-442e-9c76-244b58078a8b"
       }
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/06b45b88-cb7e-442e-9c76-244b58078a8b"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

@@ -16,7 +16,7 @@ export function DoubleTap({
   delay = 300,
 }: DoubleTapProps) {
   const lastTap = useRef<number>(0);
-  const timer = useRef<NodeJS.Timeout>();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handlePress = () => {
     const now = Date.now();

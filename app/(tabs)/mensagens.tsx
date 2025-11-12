@@ -88,7 +88,7 @@ export default function MensagensScreen() {
   };
 
   const renderEmpty = () => (
-    <FadeInView style={styles.emptyContainer}>
+    <FadeInView style={styles.emptyContainer as any}>
       <Text style={styles.emptyIcon}>💌</Text>
       <Text style={styles.emptyText}>Nenhuma mensagem ainda</Text>
       <Text style={styles.emptySubtext}>

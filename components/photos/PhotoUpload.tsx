@@ -22,7 +22,7 @@ export default function PhotoUploadComponent() {
 
   const handleSelectFromGallery = async () => {
     const uri = await pickFromGallery(false);
-    if (uri) {
+    if (uri && typeof uri === 'string') {
       setSelectedImage(uri);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }

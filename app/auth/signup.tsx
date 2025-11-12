@@ -82,7 +82,7 @@ export default function SignUpScreen() {
   };
 
   if (loading) {
-    return <Loading fullscreen />;
+    return <Loading fullScreen />;
   }
 
   return (

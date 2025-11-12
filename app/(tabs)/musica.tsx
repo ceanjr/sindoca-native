@@ -79,7 +79,7 @@ export default function MusicaScreen() {
   );
 
   const renderEmpty = () => (
-    <FadeInView style={styles.emptyContainer}>
+    <FadeInView style={styles.emptyContainer as any}>
       <Text style={styles.emptyIcon}>🎵</Text>
       <Text style={styles.emptyText}>
         {searchQuery ? 'Nenhuma música encontrada' : 'Busque músicas'}
@@ -93,7 +93,7 @@ export default function MusicaScreen() {
   );
 
   if (loading) {
-    return <Loading fullscreen />;
+    return <Loading fullScreen />;
   }
 
   if (!isAuthenticated) {

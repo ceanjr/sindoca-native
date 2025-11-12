@@ -92,7 +92,7 @@ export default function JoinWithCodeScreen() {
       Alert.alert(
         'Sucesso!',
         'Você entrou no workspace! Verifique seu email para confirmar.',
-        [{ text: 'OK', onPress: () => router.replace('/(tabs)/') }]
+        [{ text: 'OK', onPress: () => router.replace('/(tabs)/' as any) }]
       );
     } catch (error: any) {
       console.error('Join error:', error);
@@ -104,7 +104,7 @@ export default function JoinWithCodeScreen() {
   };
 
   if (loading) {
-    return <Loading fullscreen />;
+    return <Loading fullScreen />;
   }
 
   return (

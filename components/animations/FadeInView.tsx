@@ -1,13 +1,15 @@
 import React from 'react';
 import { MotiView } from 'moti';
+import { ViewStyle } from 'react-native';
 
 interface FadeInViewProps {
   children: React.ReactNode;
   delay?: number;
   duration?: number;
+  style?: ViewStyle;
 }
 
-export function FadeInView({ children, delay = 0, duration = 300 }: FadeInViewProps) {
+export function FadeInView({ children, delay = 0, duration = 300, style }: FadeInViewProps) {
   return (
     <MotiView
       from={{ opacity: 0, translateY: 20 }}
@@ -17,6 +19,7 @@ export function FadeInView({ children, delay = 0, duration = 300 }: FadeInViewPr
         duration,
         delay,
       }}
+      style={style}
     >
       {children}
     </MotiView>

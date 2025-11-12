@@ -46,7 +46,7 @@ export default function LoginScreen() {
       
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Sucesso!', 'Login realizado com sucesso');
-      router.replace('/(tabs)/');
+      router.replace('/(tabs)/' as any);
     } catch (error: any) {
       console.error('Login error:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -61,7 +61,7 @@ export default function LoginScreen() {
   };
 
   if (loading) {
-    return <Loading fullscreen />;
+    return <Loading fullScreen />;
   }
 
   return (

@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase/client';
+import { supabase } from '../supabase/client';
 
 export async function testSupabaseConnection() {
   try {
