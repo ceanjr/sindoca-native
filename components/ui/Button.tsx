@@ -47,6 +47,10 @@ export function Button({
       onPress={handlePress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: disabled || loading }}
       {...rest}
     >
       {loading ? (

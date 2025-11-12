@@ -31,9 +31,20 @@ export function Input({
           style,
         ]}
         placeholderTextColor={Colors.textTertiary}
+        accessible={true}
+        accessibilityLabel={label || rest.placeholder}
+        accessibilityHint={error}
         {...rest}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && (
+        <Text 
+          style={styles.errorText}
+          accessible={true}
+          accessibilityRole="alert"
+        >
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

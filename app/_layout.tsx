@@ -6,11 +6,14 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ErrorBoundary from 'react-native-error-boundary';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { usePushNotifications } from '@/lib/push/expo-push';
 import { useDeepLinking } from '@/hooks/useDeepLinking';
+import { ErrorFallback } from '@/components/ErrorFallback';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -18,7 +21,6 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
@@ -61,16 +63,20 @@ function RootLayoutNav() {
   }, [expoPushToken]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(modals)" options={{ headerShown: false, presentation: 'modal' }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          </Stack>
-        </ThemeProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <OfflineBanner />
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(modals)" options={{ headerShown: false, presentation: 'modal' }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            </Stack>
+          </ThemeProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
