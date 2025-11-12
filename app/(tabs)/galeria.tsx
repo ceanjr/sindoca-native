@@ -1,8 +1,9 @@
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
-import { Button, Card } from '@/components/ui';
+import { Card } from '@/components/ui';
 import { FadeInView } from '@/components/animations';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+import PhotoUploadComponent from '@/components/photos/PhotoUpload';
 
 export default function GaleriaScreen() {
   const { user } = useAuth();
@@ -17,23 +18,13 @@ export default function GaleriaScreen() {
           </Text>
         </FadeInView>
 
-        <FadeInView delay={100}>
-          <Card>
-            <Text style={styles.cardTitle}>Em breve!</Text>
-            <Text style={styles.cardText}>
-              A galeria de fotos está sendo migrada do PWA.
-            </Text>
-            <Text style={styles.cardText}>
-              Em breve você poderá adicionar e ver todas as suas fotos aqui.
-            </Text>
-          </Card>
-        </FadeInView>
-
-        {user && (
-          <FadeInView delay={200}>
+        {user ? (
+          <PhotoUploadComponent />
+        ) : (
+          <FadeInView delay={100}>
             <Card>
-              <Text style={styles.infoText}>
-                👤 Conectado como: {user.email}
+              <Text style={styles.cardText}>
+                Faça login para acessar a galeria
               </Text>
             </Card>
           </FadeInView>
@@ -62,19 +53,9 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: 24,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 8,
-  },
   cardText: {
     fontSize: 14,
     color: Colors.textSecondary,
-    marginBottom: 8,
-  },
-  infoText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
+    textAlign: 'center',
   },
 });

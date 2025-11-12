@@ -3,9 +3,12 @@ import { Button, Card } from '@/components/ui';
 import { FadeInView, ScaleOnPress } from '@/components/animations';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { PushNotificationTester } from '@/components/notifications/PushTester';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const router = useRouter();
 
   return (
     <ScrollView style={styles.container}>
@@ -13,18 +16,15 @@ export default function HomeScreen() {
         <FadeInView>
           <Text style={styles.title}>❤️ Sindoca</Text>
           <Text style={styles.subtitle}>
-            Bem-vindo ao app nativo!
+            App nativo completo!
           </Text>
         </FadeInView>
 
         <FadeInView delay={100}>
           <Card>
-            <Text style={styles.cardTitle}>🎉 Migração em Andamento</Text>
+            <Text style={styles.cardTitle}>🎉 Fase 3 Completa!</Text>
             <Text style={styles.cardText}>
-              Este é o novo app nativo do Sindoca, construído com Expo e React Native.
-            </Text>
-            <Text style={styles.cardText}>
-              Fase 2 completa! UI components, navegação e estilos implementados.
+              Todos os recursos nativos implementados!
             </Text>
           </Card>
         </FadeInView>
@@ -42,32 +42,51 @@ export default function HomeScreen() {
 
         <FadeInView delay={300}>
           <Card>
-            <Text style={styles.cardTitle}>✅ Fase 1 Completa</Text>
+            <Text style={styles.cardTitle}>✅ Features Implementadas</Text>
             <Text style={styles.cardText}>
-              • Supabase configurado{'\n'}
-              • Push Notifications prontos{'\n'}
-              • Estrutura de pastas criada
+              • Push Notifications{'\n'}
+              • Câmera & Galeria{'\n'}
+              • Gravação de Áudio{'\n'}
+              • Animações Complexas{'\n'}
+              • Deep Linking{'\n'}
+              • Offline Mode{'\n'}
+              • Spotify OAuth
             </Text>
           </Card>
         </FadeInView>
 
         <FadeInView delay={400}>
           <Card>
-            <Text style={styles.cardTitle}>✅ Fase 2 Completa</Text>
-            <Text style={styles.cardText}>
-              • Componentes UI base criados{'\n'}
-              • Navegação configurada{'\n'}
-              • Context API implementado{'\n'}
-              • Animações funcionando
-            </Text>
+            <Text style={styles.cardTitle}>🧪 Testar Features</Text>
+            <View style={styles.buttonRow}>
+              <Button
+                title="📸 Galeria"
+                onPress={() => router.push('/(tabs)/galeria')}
+                size="small"
+              />
+              <View style={styles.spacer} />
+              <Button
+                title="🎤 Áudio"
+                onPress={() => router.push('/(modals)/voice-recorder')}
+                size="small"
+                variant="secondary"
+              />
+            </View>
           </Card>
         </FadeInView>
 
         <FadeInView delay={500}>
+          <PushNotificationTester />
+        </FadeInView>
+
+        <FadeInView delay={600}>
           <ScaleOnPress>
             <Card style={styles.highlightCard}>
               <Text style={styles.highlightText}>
-                🚀 Pronto para Fase 3!
+                🚀 App Completo!
+              </Text>
+              <Text style={styles.highlightSubtext}>
+                Fases 1, 2 e 3 implementadas
               </Text>
             </Card>
           </ScaleOnPress>
@@ -107,6 +126,13 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     lineHeight: 20,
   },
+  buttonRow: {
+    flexDirection: 'row',
+    marginTop: 12,
+  },
+  spacer: {
+    width: 8,
+  },
   highlightCard: {
     backgroundColor: Colors.primary,
   },
@@ -115,5 +141,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.white,
     textAlign: 'center',
+    marginBottom: 4,
+  },
+  highlightSubtext: {
+    fontSize: 14,
+    color: Colors.white,
+    textAlign: 'center',
+    opacity: 0.9,
   },
 });
