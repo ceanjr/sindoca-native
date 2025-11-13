@@ -1,15 +1,23 @@
 -- Fix Storage Policies for Photos and other buckets
--- Run this if you're getting "new row violates row-level security policy" errors
+-- Run this in Supabase Dashboard SQL Editor
+-- IMPORTANT: This needs to be run as a superuser (automatically in Dashboard)
 
 -- =====================================================
 -- FIX PHOTOS BUCKET POLICIES
 -- =====================================================
 
--- Drop existing policies for photos bucket
-DROP POLICY IF EXISTS "Users can upload photos" ON storage.objects;
-DROP POLICY IF EXISTS "Users can update own photos" ON storage.objects;
-DROP POLICY IF EXISTS "Users can delete own photos" ON storage.objects;
-DROP POLICY IF EXISTS "Photos are viewable by workspace members" ON storage.objects;
+-- First, check if policies exist and drop them
+DO $$
+BEGIN
+  -- Drop existing policies for photos bucket if they exist
+  DROP POLICY IF EXISTS "Users can upload photos" ON storage.objects;
+  DROP POLICY IF EXISTS "Users can update own photos" ON storage.objects;
+  DROP POLICY IF EXISTS "Users can delete own photos" ON storage.objects;
+  DROP POLICY IF EXISTS "Photos are viewable by workspace members" ON storage.objects;
+EXCEPTION
+  WHEN insufficient_privilege THEN
+    RAISE NOTICE 'Skipping policy drops - insufficient privileges';
+END $$;
 
 -- Allow users to upload photos
 CREATE POLICY "Users can upload photos"
