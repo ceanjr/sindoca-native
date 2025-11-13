@@ -2,11 +2,14 @@ export const Colors = {
   primary: '#ff6b9d',
   primaryDark: '#ff4581',
   primaryLight: '#ffb3cf',
-  secondary: '#4a9eff',
+  secondary: '#FFD93D', // Amarelo suave
   secondaryDark: '#2980e8',
   secondaryLight: '#8ec5ff',
+  accent: '#6BCF7F', // Verde menta
+  lavender: '#7B68EE', // Lavanda/Roxo
   background: '#ffffff',
   backgroundSecondary: '#f8f9fa',
+  backgroundGradient: '#fafafa', // Off-white suave
   text: '#1a1a1a',
   textSecondary: '#666666',
   textTertiary: '#999999',

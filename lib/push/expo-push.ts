@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 import { supabase } from '../supabase/client';
 import { useEffect, useRef, useState } from 'react';
 
@@ -42,12 +43,25 @@ export async function registerForPushNotificationsAsync() {
     }
 
     // Get Expo Push Token
-    const projectId = '16bfc4f8-9e22-410a-aa03-0a82b933a9e9'; // Will be generated on first EAS build
-    token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
-    console.log('Expo Push Token:', token);
+    try {
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId;
 
-    // Save to Supabase
-    await savePushToken(token);
+      if (!projectId) {
+        console.warn('No Expo project ID found. Push notifications require EAS Build.');
+        return;
+      }
+
+      token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+      console.log('Expo Push Token:', token);
+
+      // Save to Supabase
+      if (token) {
+        await savePushToken(token);
+      }
+    } catch (error) {
+      console.error('Error getting Expo push token:', error);
+      return;
+    }
   } else {
     console.warn('Push notifications only work on physical devices');
   }

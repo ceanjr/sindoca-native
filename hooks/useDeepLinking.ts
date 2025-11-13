@@ -38,14 +38,14 @@ export function useDeepLinking() {
     if (path === 'photo' && queryParams?.id) {
       router.push(`/(modals)/photo/${queryParams.id}`);
     } else if (path === 'message' && queryParams?.id) {
-      router.push('/(tabs)/mensagens');
+      // router.push('/(tabs)/mensagens');
       // Could navigate to specific message
     } else if (path === 'galeria') {
       router.push('/(tabs)/galeria');
     } else if (path === 'musica') {
       router.push('/(tabs)/musica');
     } else if (path === 'perfil') {
-      router.push('/(tabs)/perfil');
+      // router.push('/(tabs)/perfil');
     } else {
       // Default to home
       router.push('/(tabs)/' as any);
