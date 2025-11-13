@@ -14,6 +14,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import * as Haptics from 'expo-haptics';
+import { supabase } from '@/lib/supabase/client';
 
 interface Track {
   id: string;
@@ -69,11 +70,13 @@ export const SpotifySearchModal: React.FC<SpotifySearchModalProps> = ({
   }, [query]);
 
   const searchSpotify = async (searchQuery: string) => {
+    console.log('🔍 Starting search for:', searchQuery);
     setIsSearching(true);
     setError(null);
 
     try {
       const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+      console.log('📍 API URL:', apiUrl);
 
       if (!apiUrl) {
         throw new Error(
@@ -81,26 +84,59 @@ export const SpotifySearchModal: React.FC<SpotifySearchModalProps> = ({
         );
       }
 
-      const response = await fetch(
-        `${apiUrl}/api/spotify/search?q=${encodeURIComponent(searchQuery)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const fullUrl = `${apiUrl}/api/spotify/search?q=${encodeURIComponent(searchQuery)}`;
+      console.log('🌐 Full URL:', fullUrl);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Erro ${response.status}: ${response.statusText}`);
+      // Get auth session for authenticated API calls
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔐 Has session:', !!session);
+
+      const headers: any = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      };
+
+      // Add auth token if available
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+        console.log('🔑 Added auth token');
       }
 
-      const data = await response.json();
+      const response = await fetch(fullUrl, {
+        method: 'GET',
+        headers,
+        credentials: 'include',
+      });
+
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response ok:', response.ok);
+
+      // Get response as text first to debug
+      const responseText = await response.text();
+      console.log('📄 Response preview:', responseText.substring(0, 200));
+
+      if (!response.ok) {
+        console.error('❌ Error response text:', responseText);
+        throw new Error(`Erro ${response.status}: ${response.statusText}`);
+      }
+
+      // Check if response is HTML instead of JSON
+      if (responseText.trim().startsWith('<')) {
+        console.error('❌ Received HTML instead of JSON');
+        console.error('📄 Full response:', responseText.substring(0, 500));
+        throw new Error('API retornou HTML em vez de JSON. A rota pode não existir ou estar protegida.');
+      }
+
+      // Parse JSON
+      const data = JSON.parse(responseText);
+      console.log('✅ Search results:', data);
+      console.log('📊 Number of tracks:', data.tracks?.length || 0);
+
       setResults(data.tracks || []);
     } catch (err: any) {
-      console.error('Search error:', err);
+      console.error('❌ Search error:', err);
+      console.error('❌ Error message:', err.message);
+      console.error('❌ Error stack:', err.stack);
 
       // Better error messages
       if (err.message.includes('Network request failed')) {
@@ -113,6 +149,7 @@ export const SpotifySearchModal: React.FC<SpotifySearchModalProps> = ({
 
       setResults([]);
     } finally {
+      console.log('✅ Search completed, setting isSearching to false');
       setIsSearching(false);
     }
   };

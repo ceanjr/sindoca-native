@@ -266,12 +266,23 @@ export default function MusicaScreen() {
         );
       }
 
+      // Get auth session for authenticated API calls
+      const { data: { session } } = await supabase.auth.getSession();
+
+      const headers: any = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      };
+
+      // Add auth token if available
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch(`${apiUrl}/api/spotify/playlist/add-track`, {
         method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+        headers,
+        credentials: 'include',
         body: JSON.stringify({
           track: {
             id: track.id,
