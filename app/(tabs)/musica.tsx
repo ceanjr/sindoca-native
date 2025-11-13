@@ -558,7 +558,7 @@ export default function MusicaScreen() {
             {/* Tracks List */}
             {filteredTracks.map((track, index) => (
               <FadeInView key={track.id} delay={index * 50}>
-                <View>
+                <View style={{ overflow: 'visible' }}>
                   <TouchableOpacity
                     style={styles.trackCard}
                     onPress={() => openSpotify(track)}
@@ -622,48 +622,43 @@ export default function MusicaScreen() {
 
                   {/* Dropdown Menu */}
                   {openMenuId === track.id && (
-                    <Pressable
-                      style={styles.menuOverlay}
-                      onPress={() => setOpenMenuId(null)}
-                    >
-                      <View style={styles.dropdownMenu}>
+                    <View style={styles.dropdownMenu}>
+                      <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(track.id);
+                          setOpenMenuId(null);
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <Ionicons
+                          name={track.is_favorite ? 'heart' : 'heart-outline'}
+                          size={20}
+                          color={track.is_favorite ? Colors.primary : Colors.textSecondary}
+                        />
+                        <Text style={styles.menuItemText}>
+                          {track.is_favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                        </Text>
+                      </TouchableOpacity>
+
+                      {track.added_by === user!.id && (
                         <TouchableOpacity
-                          style={styles.menuItem}
+                          style={[styles.menuItem, styles.menuItemDanger]}
                           onPress={(e) => {
                             e.stopPropagation();
-                            toggleFavorite(track.id);
                             setOpenMenuId(null);
+                            deleteTrack(track.id, track.added_by);
                           }}
                           activeOpacity={0.7}
                         >
-                          <Ionicons
-                            name={track.is_favorite ? 'heart' : 'heart-outline'}
-                            size={20}
-                            color={track.is_favorite ? Colors.primary : Colors.textSecondary}
-                          />
-                          <Text style={styles.menuItemText}>
-                            {track.is_favorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                          <Ionicons name="trash-outline" size={20} color={Colors.error} />
+                          <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>
+                            Remover música
                           </Text>
                         </TouchableOpacity>
-
-                        {track.added_by === user!.id && (
-                          <TouchableOpacity
-                            style={[styles.menuItem, styles.menuItemDanger]}
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(null);
-                              deleteTrack(track.id, track.added_by);
-                            }}
-                            activeOpacity={0.7}
-                          >
-                            <Ionicons name="trash-outline" size={20} color={Colors.error} />
-                            <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>
-                              Remover música
-                            </Text>
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    </Pressable>
+                      )}
+                    </View>
                   )}
                 </View>
               </FadeInView>
@@ -681,6 +676,14 @@ export default function MusicaScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Menu Overlay - close menu when clicking outside */}
+      {openMenuId && (
+        <Pressable
+          style={styles.screenOverlay}
+          onPress={() => setOpenMenuId(null)}
+        />
+      )}
 
       {/* Spotify Search Modal */}
       <SpotifySearchModal
@@ -962,10 +965,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.primary,
   },
-  menuOverlay: {
+  screenOverlay: {
     position: 'absolute',
     top: 0,
+    left: 0,
     right: 0,
+    bottom: 0,
     zIndex: 1000,
   },
   dropdownMenu: {
@@ -980,9 +985,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 5,
+    elevation: 10,
     borderWidth: 1,
     borderColor: Colors.borderLight,
+    zIndex: 1001,
   },
   menuItem: {
     flexDirection: 'row',

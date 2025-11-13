@@ -374,6 +374,14 @@ export default function RazoesScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Overlay to close menu when clicking outside */}
+      {openMenuId && (
+        <Pressable
+          style={styles.menuOverlay}
+          onPress={() => setOpenMenuId(null)}
+        />
+      )}
+
       {/* Reasons List */}
       <ScrollView
         contentContainerStyle={[
@@ -402,14 +410,7 @@ export default function RazoesScreen() {
           <>
             {visibleReasons.map((reason, index) => (
               <FadeInView key={reason.id} delay={index * 50}>
-                <Pressable
-                  style={styles.reasonCard}
-                  onPress={() => {
-                    if (openMenuId === reason.id) {
-                      setOpenMenuId(null);
-                    }
-                  }}
-                >
+                <View style={styles.reasonCard}>
                   <View style={styles.reasonHeader}>
                     <View style={styles.reasonIconContainer}>
                       <Ionicons name="heart" size={20} color={Colors.primary} />
@@ -506,7 +507,7 @@ export default function RazoesScreen() {
                       </View>
                     )}
                   </View>
-                </Pressable>
+                </View>
               </FadeInView>
             ))}
 
@@ -727,6 +728,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    overflow: 'visible',
   },
   reasonHeader: {
     flexDirection: 'row',
@@ -801,10 +803,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 10,
     minWidth: 140,
     paddingVertical: 4,
-    zIndex: 1000,
+    zIndex: 1002,
   },
   menuItem: {
     flexDirection: 'row',
@@ -969,5 +971,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.white,
+  },
+  menuOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
   },
 });
