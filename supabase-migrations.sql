@@ -1,21 +1,52 @@
 -- Migration: Add profiles and notification_settings tables
 -- Description: Creates tables for user profiles and notification settings
+-- Safe to run multiple times - uses IF NOT EXISTS and DROP IF EXISTS
 
 -- =====================================================
 -- PROFILES TABLE
 -- =====================================================
--- Table to store user profile information
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  name TEXT NOT NULL,
-  avatar_url TEXT,
-  bio TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Add new columns to profiles table if they don't exist
+DO $$
+BEGIN
+  -- Add bio column if it doesn't exist
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'profiles'
+    AND column_name = 'bio'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN bio TEXT;
+  END IF;
+
+  -- Add avatar_url column if it doesn't exist (it probably already exists)
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'profiles'
+    AND column_name = 'avatar_url'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN avatar_url TEXT;
+  END IF;
+
+  -- Add name column if it doesn't exist (it probably already exists)
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'profiles'
+    AND column_name = 'name'
+  ) THEN
+    ALTER TABLE public.profiles ADD COLUMN name TEXT;
+  END IF;
+END $$;
 
 -- Enable Row Level Security
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies to recreate them
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Workspace members can view profiles" ON public.profiles;
 
 -- Policies for profiles table
 -- Users can view their own profile
@@ -65,6 +96,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to update updated_at on profile updates
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW
@@ -90,6 +122,11 @@ CREATE TABLE IF NOT EXISTS public.notification_settings (
 -- Enable Row Level Security
 ALTER TABLE public.notification_settings ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies to recreate them
+DROP POLICY IF EXISTS "Users can view own notification settings" ON public.notification_settings;
+DROP POLICY IF EXISTS "Users can update own notification settings" ON public.notification_settings;
+DROP POLICY IF EXISTS "Users can insert own notification settings" ON public.notification_settings;
+
 -- Policies for notification_settings table
 -- Users can view their own settings
 CREATE POLICY "Users can view own notification settings"
@@ -113,6 +150,7 @@ CREATE POLICY "Users can insert own notification settings"
 CREATE INDEX IF NOT EXISTS notification_settings_user_id_idx ON public.notification_settings(user_id);
 
 -- Trigger to update updated_at on notification_settings updates
+DROP TRIGGER IF EXISTS update_notification_settings_updated_at ON public.notification_settings;
 CREATE TRIGGER update_notification_settings_updated_at
   BEFORE UPDATE ON public.notification_settings
   FOR EACH ROW
@@ -125,6 +163,12 @@ CREATE TRIGGER update_notification_settings_updated_at
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('profiles', 'profiles', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- Drop existing storage policies to recreate them
+DROP POLICY IF EXISTS "Users can upload own profile image" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update own profile image" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete own profile image" ON storage.objects;
+DROP POLICY IF EXISTS "Public profile images are viewable by everyone" ON storage.objects;
 
 -- Storage policies for profiles bucket
 -- Users can upload their own profile images
