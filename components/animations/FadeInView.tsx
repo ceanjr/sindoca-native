@@ -1,6 +1,5 @@
 import React from 'react';
-import { MotiView } from 'moti';
-import { ViewStyle } from 'react-native';
+import { ViewStyle, Platform, View } from 'react-native';
 
 interface FadeInViewProps {
   children: React.ReactNode;
@@ -10,6 +9,14 @@ interface FadeInViewProps {
 }
 
 export function FadeInView({ children, delay = 0, duration = 300, style }: FadeInViewProps) {
+  // Use MotiView only on native platforms, plain View on web to avoid SSR issues
+  if (Platform.OS === 'web') {
+    return <View style={style}>{children}</View>;
+  }
+
+  // Dynamically import MotiView only on native platforms
+  const { MotiView } = require('moti');
+
   return (
     <MotiView
       from={{ opacity: 0, translateY: 20 }}
