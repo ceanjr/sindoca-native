@@ -11,8 +11,13 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import * as Haptics from 'expo-haptics';
 
 interface MenuItemProps {
   icon: string;
@@ -73,9 +78,45 @@ function MenuItem({
   );
 }
 
+interface UserProfile {
+  name: string;
+  avatar_url: string | null;
+}
+
 export default function MenuScreen() {
   const router = useRouter();
   const { user, signOut } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    loadProfile();
+  }, [user]);
+
+  const loadProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('name, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (data) {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
+
+  const handleProfilePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/(modals)/profile');
+  };
 
   const handleLogout = async () => {
     Alert.alert('Sair', 'Tem certeza que deseja sair?', [
@@ -102,11 +143,32 @@ export default function MenuScreen() {
       >
         <FadeInView>
           <View style={styles.header}>
-            <View style={styles.avatar}>
-              <Ionicons name="person" size={40} color={Colors.white} />
-            </View>
-            <Text style={styles.userName}>{user?.email || 'Usuário'}</Text>
-            <Text style={styles.userSubtitle}>Sindoca App</Text>
+            <TouchableOpacity
+              style={styles.avatarContainer}
+              onPress={handleProfilePress}
+              activeOpacity={0.7}
+            >
+              {loadingProfile ? (
+                <View style={styles.avatar}>
+                  <ActivityIndicator size="small" color={Colors.white} />
+                </View>
+              ) : profile?.avatar_url ? (
+                <Image
+                  source={{ uri: profile.avatar_url }}
+                  style={styles.avatarImage}
+                />
+              ) : (
+                <View style={styles.avatar}>
+                  <Ionicons name="person" size={40} color={Colors.white} />
+                </View>
+              )}
+              <View style={styles.avatarBadge}>
+                <Ionicons name="camera" size={12} color={Colors.white} />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.userName}>
+              {profile?.name || user?.email?.split('@')[0] || 'Usuário'}
+            </Text>
           </View>
         </FadeInView>
 
@@ -133,22 +195,16 @@ export default function MenuScreen() {
                 icon="person"
                 title="Perfil"
                 subtitle="Editar informações"
-                onPress={() => {}}
-                disabled
+                onPress={handleProfilePress}
               />
               <MenuItem
                 icon="notifications"
                 title="Notificações"
                 subtitle="Gerenciar notificações"
-                onPress={() => {}}
-                disabled
-              />
-              <MenuItem
-                icon="settings"
-                title="Configurações"
-                subtitle="Preferências do app"
-                onPress={() => {}}
-                disabled
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(modals)/notifications');
+                }}
               />
             </View>
           </View>
@@ -187,6 +243,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 32,
   },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 16,
+  },
   avatar: {
     width: 80,
     height: 80,
@@ -194,17 +254,29 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  avatarBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.backgroundGradient,
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
     color: Colors.text,
-    marginBottom: 4,
-  },
-  userSubtitle: {
-    fontSize: 14,
-    color: Colors.textSecondary,
   },
   section: {
     marginBottom: 24,

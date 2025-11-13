@@ -1,24 +1,24 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Alert,
-  ActivityIndicator,
-  Pressable,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect, useMemo } from 'react';
+import { FadeInView, MarqueeText } from '@/components/animations';
 import { Colors } from '@/constants/Colors';
 import { CONTENT_PADDING_BOTTOM } from '@/constants/layout';
-import { FadeInView, MarqueeText } from '@/components/animations';
-import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase/client';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Reason {
   id: string;
@@ -44,7 +44,9 @@ export default function RazoesScreen() {
   const [editingReason, setEditingReason] = useState<Reason | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'sindy' | 'junior'>('all');
   const [visibleCount, setVisibleCount] = useState(REASONS_PER_PAGE);
-  const [revealedSecrets, setRevealedSecrets] = useState<Set<string>>(new Set());
+  const [revealedSecrets, setRevealedSecrets] = useState<Set<string>>(
+    new Set()
+  );
   const [randomModalVisible, setRandomModalVisible] = useState(false);
   const [randomReason, setRandomReason] = useState<Reason | null>(null);
   const [partnerId, setPartnerId] = useState<string | null>(null);
@@ -120,7 +122,10 @@ export default function RazoesScreen() {
             created_at: item.created_at,
             author_id: item.author_id,
             subject: item.data?.subject || 'sindy',
-            added_by_name: (item as any).profiles?.nickname || (item as any).profiles?.full_name || 'Desconhecido',
+            added_by_name:
+              (item as any).profiles?.nickname ||
+              (item as any).profiles?.full_name ||
+              'Desconhecido',
           }))
         );
       }
@@ -324,7 +329,12 @@ export default function RazoesScreen() {
             setVisibleCount(REASONS_PER_PAGE);
           }}
         >
-          <Text style={[styles.tabText, activeTab === 'all' && styles.tabTextActive]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'all' && styles.tabTextActive,
+            ]}
+          >
             Todas ({reasonCounts.all})
           </Text>
         </TouchableOpacity>
@@ -336,7 +346,10 @@ export default function RazoesScreen() {
           }}
         >
           <Text
-            style={[styles.tabText, activeTab === 'sindy' && styles.tabTextActive]}
+            style={[
+              styles.tabText,
+              activeTab === 'sindy' && styles.tabTextActive,
+            ]}
           >
             Sindy ({reasonCounts.sindy})
           </Text>
@@ -349,7 +362,10 @@ export default function RazoesScreen() {
           }}
         >
           <Text
-            style={[styles.tabText, activeTab === 'junior' && styles.tabTextActive]}
+            style={[
+              styles.tabText,
+              activeTab === 'junior' && styles.tabTextActive,
+            ]}
           >
             Junior ({reasonCounts.junior})
           </Text>
@@ -358,7 +374,10 @@ export default function RazoesScreen() {
 
       {/* Reasons List */}
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: CONTENT_PADDING_BOTTOM }]}
+        contentContainerStyle={[
+          styles.content,
+          { paddingBottom: CONTENT_PADDING_BOTTOM },
+        ]}
       >
         {loading ? (
           <View style={styles.loadingContainer}>
@@ -367,7 +386,11 @@ export default function RazoesScreen() {
           </View>
         ) : visibleReasons.length === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="sparkles-outline" size={64} color={Colors.textTertiary} />
+            <Ionicons
+              name="sparkles-outline"
+              size={64}
+              color={Colors.textTertiary}
+            />
             <Text style={styles.emptyText}>Nenhuma razão ainda</Text>
             <Text style={styles.emptySubtext}>
               Adicione os motivos que fazem você amar
@@ -413,7 +436,7 @@ export default function RazoesScreen() {
                           <Text style={styles.secretButtonText}>
                             {revealedSecrets.has(reason.id)
                               ? 'Ocultar'
-                              : 'Revelar segredo'}
+                              : 'Revelar'}
                           </Text>
                         </TouchableOpacity>
                       )}
@@ -429,12 +452,20 @@ export default function RazoesScreen() {
                       <View style={styles.menuContainer}>
                         <TouchableOpacity
                           onPress={() => {
-                            setOpenMenuId(openMenuId === reason.id ? null : reason.id);
-                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            setOpenMenuId(
+                              openMenuId === reason.id ? null : reason.id
+                            );
+                            Haptics.impactAsync(
+                              Haptics.ImpactFeedbackStyle.Light
+                            );
                           }}
                           style={styles.menuButton}
                         >
-                          <Ionicons name="ellipsis-vertical" size={20} color={Colors.textSecondary} />
+                          <Ionicons
+                            name="ellipsis-vertical"
+                            size={20}
+                            color={Colors.textSecondary}
+                          />
                         </TouchableOpacity>
                         {openMenuId === reason.id && (
                           <View style={styles.dropdownMenu}>
@@ -442,7 +473,11 @@ export default function RazoesScreen() {
                               style={styles.menuItem}
                               onPress={() => editReason(reason)}
                             >
-                              <Ionicons name="pencil" size={18} color={Colors.textSecondary} />
+                              <Ionicons
+                                name="pencil"
+                                size={18}
+                                color={Colors.textSecondary}
+                              />
                               <Text style={styles.menuItemText}>Editar</Text>
                             </TouchableOpacity>
                             <View style={styles.menuDivider} />
@@ -450,8 +485,19 @@ export default function RazoesScreen() {
                               style={styles.menuItem}
                               onPress={() => deleteReason(reason.id)}
                             >
-                              <Ionicons name="trash" size={18} color={Colors.error} />
-                              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Apagar</Text>
+                              <Ionicons
+                                name="trash"
+                                size={18}
+                                color={Colors.error}
+                              />
+                              <Text
+                                style={[
+                                  styles.menuItemText,
+                                  styles.menuItemTextDanger,
+                                ]}
+                              >
+                                Apagar
+                              </Text>
                             </TouchableOpacity>
                           </View>
                         )}
@@ -463,9 +509,13 @@ export default function RazoesScreen() {
             ))}
 
             {hasMoreReasons && (
-              <TouchableOpacity style={styles.loadMoreButton} onPress={loadMore}>
+              <TouchableOpacity
+                style={styles.loadMoreButton}
+                onPress={loadMore}
+              >
                 <Text style={styles.loadMoreText}>
-                  Carregar mais ({filteredReasons.length - visibleCount} restantes)
+                  Carregar mais ({filteredReasons.length - visibleCount}{' '}
+                  restantes)
                 </Text>
               </TouchableOpacity>
             )}
@@ -544,7 +594,9 @@ export default function RazoesScreen() {
             <Text style={styles.randomTitle}>Razão Aleatória</Text>
             {randomReason && (
               <View style={styles.randomReasonCard}>
-                <Text style={styles.randomReasonText}>{randomReason.reason}</Text>
+                <Text style={styles.randomReasonText}>
+                  {randomReason.reason}
+                </Text>
                 {randomReason.description && (
                   <Text style={styles.randomDescriptionText}>
                     {randomReason.description}
