@@ -3,110 +3,86 @@
 -- IMPORTANT: This needs to be run as a superuser (automatically in Dashboard)
 
 -- =====================================================
--- FIX PHOTOS BUCKET POLICIES
+-- FIX GALLERY BUCKET POLICIES
 -- =====================================================
 
 -- First, check if policies exist and drop them
 DO $$
 BEGIN
-  -- Drop existing policies for photos bucket if they exist
-  DROP POLICY IF EXISTS "Users can upload photos" ON storage.objects;
-  DROP POLICY IF EXISTS "Users can update own photos" ON storage.objects;
-  DROP POLICY IF EXISTS "Users can delete own photos" ON storage.objects;
-  DROP POLICY IF EXISTS "Photos are viewable by workspace members" ON storage.objects;
+  -- Drop existing policies for gallery bucket if they exist
+  DROP POLICY IF EXISTS "Users can upload to gallery" ON storage.objects;
+  DROP POLICY IF EXISTS "Users can update gallery" ON storage.objects;
+  DROP POLICY IF EXISTS "Users can delete from gallery" ON storage.objects;
+  DROP POLICY IF EXISTS "Anyone can view gallery" ON storage.objects;
 EXCEPTION
   WHEN insufficient_privilege THEN
     RAISE NOTICE 'Skipping policy drops - insufficient privileges';
 END $$;
 
--- Allow users to upload photos
-CREATE POLICY "Users can upload photos"
+-- Allow users to upload to gallery
+CREATE POLICY "Users can upload to gallery"
   ON storage.objects
   FOR INSERT
   WITH CHECK (
-    bucket_id = 'photos'
+    bucket_id = 'gallery'
     AND auth.uid() IS NOT NULL
   );
 
--- Allow users to update their own photos
-CREATE POLICY "Users can update own photos"
+-- Allow users to update their own gallery items
+CREATE POLICY "Users can update gallery"
   ON storage.objects
   FOR UPDATE
   USING (
-    bucket_id = 'photos'
+    bucket_id = 'gallery'
     AND auth.uid() IS NOT NULL
   );
 
--- Allow users to delete their own photos
-CREATE POLICY "Users can delete own photos"
+-- Allow users to delete their own gallery items
+CREATE POLICY "Users can delete from gallery"
   ON storage.objects
   FOR DELETE
   USING (
-    bucket_id = 'photos'
+    bucket_id = 'gallery'
     AND auth.uid() IS NOT NULL
   );
 
--- Allow workspace members to view photos
-CREATE POLICY "Photos are viewable by workspace members"
+-- Allow everyone to view gallery
+CREATE POLICY "Anyone can view gallery"
   ON storage.objects
   FOR SELECT
   USING (
-    bucket_id = 'photos'
+    bucket_id = 'gallery'
   );
 
 -- =====================================================
--- ENSURE PHOTOS BUCKET EXISTS AND IS PUBLIC
+-- ENSURE GALLERY BUCKET EXISTS AND IS PUBLIC
 -- =====================================================
 
--- Create photos bucket if it doesn't exist
+-- Create gallery bucket if it doesn't exist
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('photos', 'photos', true)
+VALUES ('gallery', 'gallery', true)
 ON CONFLICT (id) DO UPDATE
 SET public = true;
 
 -- =====================================================
--- FIX MUSIC/AUDIO BUCKET IF NEEDED
+-- FIX PROFILES BUCKET POLICIES
 -- =====================================================
 
--- Drop existing policies for audio bucket if it exists
-DROP POLICY IF EXISTS "Users can upload audio" ON storage.objects;
-DROP POLICY IF EXISTS "Users can delete own audio" ON storage.objects;
-DROP POLICY IF EXISTS "Audio is viewable by workspace members" ON storage.objects;
+-- Drop existing policies for profiles bucket if they exist
+DROP POLICY IF EXISTS "Users can upload own profile image" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update own profile image" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete own profile image" ON storage.objects;
+DROP POLICY IF EXISTS "Public profile images are viewable by everyone" ON storage.objects;
 
--- Allow users to upload audio
-CREATE POLICY "Users can upload audio"
-  ON storage.objects
-  FOR INSERT
-  WITH CHECK (
-    bucket_id = 'audio'
-    AND auth.uid() IS NOT NULL
-  );
-
--- Allow users to delete their own audio
-CREATE POLICY "Users can delete own audio"
-  ON storage.objects
-  FOR DELETE
-  USING (
-    bucket_id = 'audio'
-    AND auth.uid() IS NOT NULL
-  );
-
--- Allow workspace members to view audio
-CREATE POLICY "Audio is viewable by workspace members"
-  ON storage.objects
-  FOR SELECT
-  USING (
-    bucket_id = 'audio'
-  );
-
--- Create audio bucket if it doesn't exist
+-- Ensure profiles bucket exists and is public
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('audio', 'audio', true)
-ON CONFLICT (id) DO NOTHING;
+VALUES ('profiles', 'profiles', true)
+ON CONFLICT (id) DO UPDATE
+SET public = true;
 
 -- =====================================================
 -- COMMENTS
 -- =====================================================
 
-COMMENT ON POLICY "Users can upload photos" ON storage.objects IS 'Allow authenticated users to upload photos';
-COMMENT ON POLICY "Photos are viewable by workspace members" ON storage.objects IS 'Public read access for photos';
+COMMENT ON POLICY "Users can upload to gallery" ON storage.objects IS 'Allow authenticated users to upload to gallery';
+COMMENT ON POLICY "Anyone can view gallery" ON storage.objects IS 'Public read access for gallery photos';

@@ -12,71 +12,79 @@ Esse erro acontece quando as policies de storage estão bloqueando uploads. Siga
 2. Selecione seu projeto
 3. Clique em **Storage** no menu lateral
 
-### 2. Configurar o Bucket "photos"
+### 2. Configurar o Bucket "gallery"
 
-#### Criar o bucket (se não existir):
+#### O bucket já deve existir. Se não existir:
 1. Clique em "New bucket"
-2. Nome: `photos`
+2. Nome: `gallery`
 3. Marque "Public bucket" ✅
 4. Clique em "Create bucket"
 
 #### Configurar Policies:
-1. Clique no bucket `photos`
+1. Clique no bucket `gallery`
 2. Vá para a aba **Policies**
 3. Clique em "New Policy"
 
 **Policy 1: Upload de Fotos**
-- Name: `Users can upload photos`
+- Name: `Users can upload to gallery`
 - Policy Command: `INSERT`
 - Policy Definition:
 ```sql
-bucket_id = 'photos' AND auth.uid() IS NOT NULL
+bucket_id = 'gallery' AND auth.uid() IS NOT NULL
 ```
 
 **Policy 2: Leitura de Fotos**
-- Name: `Anyone can view photos`
+- Name: `Anyone can view gallery`
 - Policy Command: `SELECT`
 - Policy Definition:
 ```sql
-bucket_id = 'photos'
+bucket_id = 'gallery'
 ```
 
 **Policy 3: Delete de Fotos (Opcional)**
-- Name: `Users can delete their photos`
+- Name: `Users can delete from gallery`
 - Policy Command: `DELETE`
 - Policy Definition:
 ```sql
-bucket_id = 'photos' AND auth.uid() IS NOT NULL
+bucket_id = 'gallery' AND auth.uid() IS NOT NULL
 ```
 
 ### 3. Configurar o Bucket "profiles"
 
 Repita o mesmo processo para o bucket `profiles`:
 
-1. Criar bucket `profiles` (se não existir) - Marcar como público
-2. Adicionar policies:
+#### O bucket já deve existir. Configure as policies:
+
+1. Clique no bucket `profiles`
+2. Vá para **Policies**
+3. Adicione as policies:
 
 **Policy 1: Upload**
+- Policy Command: `INSERT`
+- Definition:
 ```sql
 bucket_id = 'profiles' AND auth.uid() IS NOT NULL
 ```
 
 **Policy 2: Leitura**
+- Policy Command: `SELECT`
+- Definition:
 ```sql
 bucket_id = 'profiles'
 ```
 
 **Policy 3: Delete**
+- Policy Command: `DELETE`
+- Definition:
 ```sql
 bucket_id = 'profiles' AND auth.uid() IS NOT NULL
 ```
 
-### 4. Configurar o Bucket "audio" (se necessário)
+### 4. Bucket "audio" (Não é necessário no momento)
 
-Se você tiver recursos de áudio:
-
-1. Criar bucket `audio` - Marcar como público
-2. Adicionar as mesmas policies (substituindo 'photos' por 'audio')
+O app atualmente não usa bucket de áudio. Você só precisa de:
+- `gallery` - Fotos da galeria
+- `profiles` - Fotos de perfil
 
 ## Solução via SQL (Alternativa)
 
@@ -86,21 +94,21 @@ Se preferir via SQL, execute no **SQL Editor do Dashboard** (não via API):
 -- Habilitar RLS na tabela storage.objects (se ainda não estiver)
 ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
 
--- Criar policies para photos
-CREATE POLICY "Users can upload photos"
+-- Criar policies para gallery
+CREATE POLICY "Users can upload to gallery"
 ON storage.objects FOR INSERT
 TO authenticated
-WITH CHECK (bucket_id = 'photos');
+WITH CHECK (bucket_id = 'gallery');
 
-CREATE POLICY "Anyone can view photos"
+CREATE POLICY "Anyone can view gallery"
 ON storage.objects FOR SELECT
 TO public
-USING (bucket_id = 'photos');
+USING (bucket_id = 'gallery');
 
-CREATE POLICY "Users can delete photos"
+CREATE POLICY "Users can delete from gallery"
 ON storage.objects FOR DELETE
 TO authenticated
-USING (bucket_id = 'photos');
+USING (bucket_id = 'gallery');
 
 -- Criar policies para profiles
 CREATE POLICY "Users can upload profiles"
@@ -148,9 +156,8 @@ Você tentou executar via cliente SQL normal. Use o **SQL Editor do Dashboard**.
 
 | Bucket    | Público | Usado Para           |
 |-----------|---------|----------------------|
-| photos    | ✅ Sim  | Fotos da galeria     |
+| gallery   | ✅ Sim  | Fotos da galeria     |
 | profiles  | ✅ Sim  | Fotos de perfil      |
-| audio     | ✅ Sim  | Gravações de áudio   |
 
 ---
 
