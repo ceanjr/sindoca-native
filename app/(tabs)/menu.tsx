@@ -3,7 +3,7 @@ import { Colors } from '@/constants/Colors';
 import { CONTENT_PADDING_BOTTOM } from '@/constants/layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import {
   Alert,
   ScrollView,
@@ -15,7 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import * as Haptics from 'expo-haptics';
 
@@ -92,6 +92,13 @@ export default function MenuScreen() {
   useEffect(() => {
     loadProfile();
   }, [user]);
+
+  // Reload profile when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [user])
+  );
 
   const loadProfile = async () => {
     if (!user) return;

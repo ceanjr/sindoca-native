@@ -9,7 +9,9 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -530,53 +532,58 @@ export default function RazoesScreen() {
         transparent
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {editingReason ? 'Editar Razão' : 'Nova Razão'}
-              </Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color={Colors.textSecondary} />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>
+                  {editingReason ? 'Editar Razão' : 'Nova Razão'}
+                </Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                  <Ionicons name="close" size={24} color={Colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: Seu sorriso ilumina meu dia"
+                placeholderTextColor={Colors.textTertiary}
+                value={newReason}
+                onChangeText={setNewReason}
+                multiline
+                maxLength={200}
+                autoFocus
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Descrição ou segredo (opcional)"
+                placeholderTextColor={Colors.textTertiary}
+                value={newDescription}
+                onChangeText={setNewDescription}
+                multiline
+                maxLength={300}
+              />
+
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  !newReason.trim() && styles.submitButtonDisabled,
+                ]}
+                onPress={addReason}
+                disabled={!newReason.trim()}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.submitButtonText}>
+                  {editingReason ? 'Atualizar' : 'Adicionar'}
+                </Text>
               </TouchableOpacity>
             </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: Seu sorriso ilumina meu dia"
-              placeholderTextColor={Colors.textTertiary}
-              value={newReason}
-              onChangeText={setNewReason}
-              multiline
-              maxLength={200}
-              autoFocus
-            />
-
-            <TextInput
-              style={styles.input}
-              placeholder="Descrição ou segredo (opcional)"
-              placeholderTextColor={Colors.textTertiary}
-              value={newDescription}
-              onChangeText={setNewDescription}
-              multiline
-              maxLength={300}
-            />
-
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                !newReason.trim() && styles.submitButtonDisabled,
-              ]}
-              onPress={addReason}
-              disabled={!newReason.trim()}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.submitButtonText}>
-                {editingReason ? 'Atualizar' : 'Adicionar'}
-              </Text>
-            </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Random Reason Modal */}

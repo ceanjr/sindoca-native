@@ -10,7 +10,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -29,6 +29,7 @@ interface UserProfile {
 export default function ProfileScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -124,18 +125,18 @@ export default function ProfileScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
       // Get file extension
-      const ext = uri.split('.').pop();
+      const ext = uri.split('.').pop() || 'jpg';
       const fileName = `${user.id}-${Date.now()}.${ext}`;
       const filePath = `avatars/${fileName}`;
 
-      // Convert uri to blob for upload
+      // Read file as ArrayBuffer
       const response = await fetch(uri);
-      const blob = await response.blob();
+      const arrayBuffer = await response.arrayBuffer();
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('profiles')
-        .upload(filePath, blob, {
+        .upload(filePath, arrayBuffer, {
           contentType: `image/${ext}`,
           upsert: true,
         });
@@ -231,7 +232,10 @@ export default function ProfileScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+      >
         {/* Avatar */}
         <View style={styles.avatarSection}>
           <TouchableOpacity
